@@ -76,8 +76,8 @@ Best configuration found via Bayesian optimization (TPE sampler, median pruner):
 
 | Hyperparameter | Value |
 |---|---|
-| $\lambda_{\text{BW\_mon}}$ | 0.0 |
-| $\lambda_{\text{IL\_mon}}$ | 0.3 |
+| $\lambda_{\text{BW}_\text{mon}}$ | 0.9 |
+| $\lambda_{\text{IL}_\text{mon}}$ | 0.3 |
 | $\lambda_{V_\pi L}$ | 0.005 |
 | $\lambda_{\text{smooth}}$ | 0.1 |
 
