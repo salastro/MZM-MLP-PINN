@@ -108,3 +108,6 @@ pip install torch jax jaxlib flax equinox optax optuna scikit-learn matplotlib
 2. Open any notebook to explore the corresponding model/framework combination.
 3. Run all cells to train the model and visualize results.
 4. To use the pre-trained MoE-PINN, load `best_model.pt` with the architecture defined in the main notebook.
+
+# References
+Paula, Aldaya, I., Tiago Sutili, Figueiredo, R. C., Pita, J. L., & Bustamante, R. (2023). Design of a silicon Mach–Zehnder modulator via deep learning and evolutionary algorithms. Scientific Reports, 13(1). https://doi.org/10.1038/s41598-023-41558-8
