@@ -1,12 +1,15 @@
-# Physics-Informed Neural Network Modeling of Mach-Zehnder Modulators
+# MLP Hyperparameter Tuning — MZM PINN (JAX / Flax)
 
-Surrogate neural network models for predicting the performance of silicon photonic **Mach-Zehnder Modulators (MZMs)** from geometric design parameters, incorporating physical constraints via a **Physics-Informed Neural Network (PINN)** loss formulation.
+> **Branch:** `hyper/mlp-jax` — diverges from `hyper/mlp`
+> PyTorch implementation of this search: `hyper/mlp`
+
+Bayesian hyperparameter search for the **Multi-Layer Perceptron (MLP)** surrogate of Mach-Zehnder Modulators, using **JAX**, **Flax**, and **Optuna**.
 
 ## Overview
 
-MZMs are essential components in optical communication systems. Designing them typically requires expensive electromagnetic simulations. This project trains neural network surrogates — **Multi-Layer Perceptrons (MLPs)** and **Mixture-of-Experts (MoE)** networks — that map device geometry to key performance metrics, enforced by physics-based soft constraints through automatic differentiation.
+MZMs are essential components in optical communication systems. This branch re-implements the MLP hyperparameter search from `hyper/mlp` using **JAX / Flax** with forward-mode automatic differentiation (forward-AD) for the physics-informed loss.
 
-Two deep learning frameworks are explored: **PyTorch** and **JAX** (Flax / Equinox).
+For the base MoE-PINN model see the `master` branch.
 
 ## Dataset
 
@@ -33,19 +36,18 @@ The dataset ([Sim_generated_dataset.txt](Sim_generated_dataset.txt)) contains **
 | `IL` | Insertion loss (dB) |
 | `V_pi` | Half-wave voltage (V) |
 
-## Models
+## Model
 
-### Multi-Layer Perceptron (MLP)
+A feedforward MLP implemented in **Flax**. Hyperparameters searched via Optuna (TPE sampler, median pruner):
 
-A 5-layer feedforward network with BatchNorm, dropout, and residual connections.
-
-### Mixture of Experts (MoE)
-
-Multiple expert sub-networks whose outputs are blended by a learned gating network (softmax-weighted sum). Supports configurable number of experts, hidden dimensions, and activation functions (ReLU, Tanh, Gaussian).
+- Number of layers and hidden dimensions
+- Dropout rate
+- Learning rate and weight decay (`optax`)
+- Physics constraint weights ($\lambda$)
 
 ## Physics-Informed Constraints
 
-Physical priors are enforced as penalty terms in the loss via autograd:
+Physical priors are enforced as penalty terms in the loss via JAX forward-mode AD:
 
 | Constraint | Formulation | Physical Meaning |
 |---|---|---|
@@ -60,38 +62,13 @@ Each term is weighted by a tunable $\lambda$ optimized via Optuna.
 
 | File | Description |
 |---|---|
-| [MZM_MoE_PINN_Model.ipynb](MZM_MoE_PINN_Model.ipynb) | Main notebook — trains MoE-PINN in PyTorch with data-only baseline comparison |
-| [MZM_Hyperparameter_Tuning_MoE.ipynb](MZM_Hyperparameter_Tuning_MoE.ipynb) | Optuna hyperparameter search for MoE (PyTorch) |
-| [MZM_Hyperparameter_Tuning_MoE_JAX.ipynb](MZM_Hyperparameter_Tuning_MoE_JAX.ipynb) | Optuna hyperparameter search for MoE (JAX / Equinox) |
-| [MZM_Hyperparameter_Tuning_MLP.ipynb](MZM_Hyperparameter_Tuning_MLP.ipynb) | Optuna hyperparameter search for MLP (PyTorch) |
 | [MZM_Hyperparameter_Tuning_MLP_JAX.ipynb](MZM_Hyperparameter_Tuning_MLP_JAX.ipynb) | Optuna hyperparameter search for MLP (JAX / Flax) |
-| [mzm_moe_pinn_model(1).py](mzm_moe_pinn_model(1).py) | Standalone Python export of the main MoE-PINN notebook |
-| [best_hyperparams.json](best_hyperparams.json) | Best configuration found by Optuna |
-| [best_model.pt](best_model.pt) | Saved PyTorch model weights (state dict) |
 | [Sim_generated_dataset.txt](Sim_generated_dataset.txt) | Simulation dataset (9,633 samples) |
-
-## Results
-
-Best configuration found via Bayesian optimization (TPE sampler, median pruner):
-
-| Hyperparameter | Value |
-|---|---|
-| $\lambda_{\text{BW}_\text{mon}}$ | 0.9 |
-| $\lambda_{\text{IL}_\text{mon}}$ | 0.3 |
-| $\lambda_{V_\pi L}$ | 0.005 |
-| $\lambda_{\text{smooth}}$ | 0.1 |
-
-| Metric | Value |
-|---|---|
-| Train MSE | 0.0111 |
-| Test MSE | 0.0136 |
-| Model parameters | 619,503 |
 
 ## Dependencies
 
 - Python 3.x
-- **PyTorch** — model training and autograd-based physics constraints
-- **JAX / Flax / Equinox / Optax** — alternative implementations with forward-mode AD
+- **JAX / Flax / Optax** — model, training, and forward-mode AD
 - **Optuna** — Bayesian hyperparameter optimization
 - **scikit-learn** — data preprocessing (`StandardScaler`, `train_test_split`)
 - **Matplotlib** — visualization
@@ -99,15 +76,15 @@ Best configuration found via Bayesian optimization (TPE sampler, median pruner):
 Install with:
 
 ```bash
-pip install torch jax jaxlib flax equinox optax optuna scikit-learn matplotlib
+pip install jax jaxlib flax optax optuna scikit-learn matplotlib
 ```
 
 ## Usage
 
 1. Place `Sim_generated_dataset.txt` in the working directory.
-2. Open any notebook to explore the corresponding model/framework combination.
-3. Run all cells to train the model and visualize results.
-4. To use the pre-trained MoE-PINN, load `best_model.pt` with the architecture defined in the main notebook.
+2. Open `MZM_Hyperparameter_Tuning_MLP_JAX.ipynb` and run all cells.
+3. Optuna will run the search and report the best hyperparameter configuration.
 
-# References
+## References
+
 Paula, Aldaya, I., Tiago Sutili, Figueiredo, R. C., Pita, J. L., & Bustamante, R. (2023). Design of a silicon Mach–Zehnder modulator via deep learning and evolutionary algorithms. Scientific Reports, 13(1). https://doi.org/10.1038/s41598-023-41558-8
