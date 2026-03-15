@@ -58,17 +58,48 @@ Each term is weighted by a tunable $\lambda$ optimized via Optuna.
 
 ## Project Structure
 
+The repository is organised into branches so that each experiment lives in its own line of history.
+
+```
+master
+├── hyper/mlp          ← diverges from master
+│   └── hyper/mlp-jax  ← diverges from hyper/mlp
+└── hyper/moe          ← diverges from master
+    └── hyper/moe-jax  ← diverges from hyper/moe
+```
+
+### `master`
+
 | File | Description |
 |---|---|
 | [MZM_MoE_PINN_Model.ipynb](MZM_MoE_PINN_Model.ipynb) | Main notebook — trains MoE-PINN in PyTorch with data-only baseline comparison |
-| [MZM_Hyperparameter_Tuning_MoE.ipynb](MZM_Hyperparameter_Tuning_MoE.ipynb) | Optuna hyperparameter search for MoE (PyTorch) |
-| [MZM_Hyperparameter_Tuning_MoE_JAX.ipynb](MZM_Hyperparameter_Tuning_MoE_JAX.ipynb) | Optuna hyperparameter search for MoE (JAX / Equinox) |
-| [MZM_Hyperparameter_Tuning_MLP.ipynb](MZM_Hyperparameter_Tuning_MLP.ipynb) | Optuna hyperparameter search for MLP (PyTorch) |
-| [MZM_Hyperparameter_Tuning_MLP_JAX.ipynb](MZM_Hyperparameter_Tuning_MLP_JAX.ipynb) | Optuna hyperparameter search for MLP (JAX / Flax) |
-| [mzm_moe_pinn_model(1).py](mzm_moe_pinn_model(1).py) | Standalone Python export of the main MoE-PINN notebook |
 | [best_hyperparams.json](best_hyperparams.json) | Best configuration found by Optuna |
 | [best_model.pt](best_model.pt) | Saved PyTorch model weights (state dict) |
 | [Sim_generated_dataset.txt](Sim_generated_dataset.txt) | Simulation dataset (9,633 samples) |
+
+### `hyper/mlp`
+
+| File | Description |
+|---|---|
+| `MZM_Hyperparameter_Tuning_MLP.ipynb` | Optuna hyperparameter search for MLP (PyTorch) |
+
+### `hyper/mlp-jax`
+
+| File | Description |
+|---|---|
+| `MZM_Hyperparameter_Tuning_MLP_JAX.ipynb` | Optuna hyperparameter search for MLP (JAX / Flax) |
+
+### `hyper/moe`
+
+| File | Description |
+|---|---|
+| `MZM_Hyperparameter_Tuning_MoE.ipynb` | Optuna hyperparameter search for MoE (PyTorch) |
+
+### `hyper/moe-jax`
+
+| File | Description |
+|---|---|
+| `MZM_Hyperparameter_Tuning_MoE_JAX.ipynb` | Optuna hyperparameter search for MoE (JAX / Equinox) |
 
 ## Results
 
@@ -105,8 +136,15 @@ pip install torch jax jaxlib flax equinox optax optuna scikit-learn matplotlib
 ## Usage
 
 1. Place `Sim_generated_dataset.txt` in the working directory.
-2. Open any notebook to explore the corresponding model/framework combination.
-3. Run all cells to train the model and visualize results.
+2. Check out the branch for the experiment you want to run:
+   ```bash
+   git checkout master          # core MoE-PINN model (PyTorch)
+   git checkout hyper/mlp       # MLP hyperparameter search (PyTorch)
+   git checkout hyper/mlp-jax   # MLP hyperparameter search (JAX / Flax)
+   git checkout hyper/moe       # MoE hyperparameter search (PyTorch)
+   git checkout hyper/moe-jax   # MoE hyperparameter search (JAX / Equinox)
+   ```
+3. Open the notebook in that branch and run all cells to train the model and visualize results.
 4. To use the pre-trained MoE-PINN, load `best_model.pt` with the architecture defined in the main notebook.
 
 # References
